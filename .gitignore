@@ -1,0 +1,15 @@
+# dependencies
+**/node_modules
+
+# env files
+**/.env
+
+# build output
+frontend/dist
+
+# uploads
+backend/src/uploads/*
+!backend/src/uploads/.gitkeep
+
+# logs
+npm-debug.log*
