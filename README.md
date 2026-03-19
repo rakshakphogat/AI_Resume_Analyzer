@@ -17,6 +17,8 @@ AI Resume Analyzer is a full-stack MERN application where users can sign up, upl
 ## Features
 
 - JWT signup/login authentication with protected routes
+- Google login (OAuth ID token flow)
+- Forgot password + reset password via Nodemailer
 - Resume upload (PDF/DOCX) using Multer
 - Resume parsing via `pdf-parse` and `mammoth`
 - AI analysis for:
@@ -26,6 +28,10 @@ AI Resume Analyzer is a full-stack MERN application where users can sign up, upl
   - Strengths
   - Weaknesses
   - Actionable suggestions
+- Cover letter generator from resume + JD with selectable tone and length
+- Interview question generator (technical + behavioral)
+- Missing project recommender based on role and skill gaps
+- AI bullet point rewriter to STAR format
 - Resume history tracking
 - Skill gap analysis with optional target role
 - Downloadable AI feedback report
@@ -84,7 +90,9 @@ AI Resume Analyzer/
         AuthContext.jsx
       pages/
         DashboardPage.jsx
+        ForgotPasswordPage.jsx
         LoginPage.jsx
+        ResetPasswordPage.jsx
         SignupPage.jsx
       services/
         api.js
@@ -130,6 +138,9 @@ AI Resume Analyzer/
 
 - `POST /api/auth/signup` - Create user account
 - `POST /api/auth/login` - Login and receive JWT
+- `POST /api/auth/google` - Login/signup with Google ID token
+- `POST /api/auth/forgot-password` - Send password reset email
+- `POST /api/auth/reset-password/:token` - Reset password with token
 - `GET /api/auth/me` - Get current user profile (protected)
 
 ### Resume
@@ -138,6 +149,10 @@ AI Resume Analyzer/
 - `GET /api/resumes` - Get current user resume history (protected)
 - `GET /api/resumes/:id` - Get one analysis (protected)
 - `GET /api/resumes/:id/report` - Download feedback report text file (protected)
+- `POST /api/resumes/:id/cover-letter` - Generate tailored cover letter (protected)
+- `POST /api/resumes/:id/interview-questions` - Generate interview questions (protected)
+- `POST /api/resumes/:id/missing-projects` - Recommend portfolio projects (protected)
+- `POST /api/resumes/:id/rewrite-bullets` - Rewrite bullets into STAR format (protected)
 - `GET /api/resumes/prompt-example` - Example OpenAI prompt (protected)
 
 ## Example AI Prompt Used
@@ -179,6 +194,8 @@ Update `.env` values:
 - `AI_PROVIDER` (`groq`, `openai`, or `mock`)
 - `GROQ_API_KEY` (recommended free option)
 - `OPENAI_API_KEY` (optional if using OpenAI)
+- `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`
+- `GOOGLE_CLIENT_ID`
 - Optional Cloudinary vars if `USE_CLOUDINARY=true`
 
 ## 2. Frontend Setup
@@ -194,6 +211,7 @@ Set `VITE_API_BASE_URL`, for local dev:
 
 ```text
 VITE_API_BASE_URL=http://localhost:5000/api
+VITE_GOOGLE_CLIENT_ID=your_google_client_id
 ```
 
 ## 3. Run App

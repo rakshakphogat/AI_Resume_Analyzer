@@ -15,6 +15,23 @@ const envSchema = z.object({
     OPENAI_API_KEY: z.string().optional(),
     OPENAI_MODEL: z.string().default("gpt-4o-mini"),
     CLIENT_URL: z.string().default("http://localhost:5173"),
+    SMTP_HOST: z.string().optional(),
+    SMTP_PORT: z
+        .string()
+        .default("587")
+        .transform((value) => Number(value)),
+    SMTP_SECURE: z
+        .string()
+        .default("false")
+        .transform((value) => value === "true"),
+    SMTP_USER: z.string().optional(),
+    SMTP_PASS: z.string().optional(),
+    SMTP_FROM: z.string().default("no-reply@ai-resume-analyzer.local"),
+    RESET_TOKEN_EXPIRES_MINUTES: z
+        .string()
+        .default("20")
+        .transform((value) => Number(value)),
+    GOOGLE_CLIENT_ID: z.string().optional(),
     USE_CLOUDINARY: z
         .string()
         .default("false")

@@ -1,11 +1,26 @@
 import fs from "fs/promises";
 
 import Resume from "../models/Resume.js";
-import { analyzeResumeText, getResumeAnalysisPromptExample } from "../services/aiAnalysis.service.js";
+import {
+    analyzeResumeText,
+    generateCoverLetter,
+    generateInterviewQuestions,
+    generateMissingProjects,
+    getResumeAnalysisPromptExample,
+    rewriteExperienceBullets,
+} from "../services/aiAnalysis.service.js";
 import { extractTextFromResume } from "../services/parseResume.service.js";
 import { uploadFileIfNeeded } from "../services/storage.service.js";
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+
+const findUserResumeOrThrow = async (resumeId, userId) => {
+    const resume = await Resume.findOne({ _id: resumeId, userId });
+    if (!resume) {
+        throw new ApiError(404, "Resume not found");
+    }
+    return resume;
+};
 
 export const uploadAndAnalyzeResume = asyncHandler(async (req, res) => {
     if (!req.file) {
@@ -97,4 +112,72 @@ export const downloadFeedbackReport = asyncHandler(async (req, res) => {
 
 export const getAnalysisPromptExample = asyncHandler(async (_req, res) => {
     res.status(200).json({ prompt: getResumeAnalysisPromptExample() });
+});
+
+export const createCoverLetter = asyncHandler(async (req, res) => {
+    const resume = await findUserResumeOrThrow(req.params.id, req.user.id);
+    const {
+        jobDescription = "",
+        tone = "professional",
+        length = "medium",
+        targetRole = resume.targetRole || "",
+    } = req.body;
+
+    const result = await generateCoverLetter({
+        resumeText: resume.extractedText,
+        targetRole,
+        tone,
+        length,
+        jobDescription,
+    });
+
+    res.status(200).json({ data: result });
+});
+
+export const createInterviewQuestions = asyncHandler(async (req, res) => {
+    const resume = await findUserResumeOrThrow(req.params.id, req.user.id);
+    const { role = resume.targetRole || "", count = 8 } = req.body;
+
+    const result = await generateInterviewQuestions({
+        resumeText: resume.extractedText,
+        role,
+        count,
+    });
+
+    res.status(200).json({ data: result });
+});
+
+export const recommendProjects = asyncHandler(async (req, res) => {
+    const resume = await findUserResumeOrThrow(req.params.id, req.user.id);
+    const {
+        targetRole = resume.targetRole || "",
+        missingSkills = resume.missingSkills || [],
+        count = 4,
+    } = req.body;
+
+    const result = await generateMissingProjects({
+        resumeText: resume.extractedText,
+        targetRole,
+        missingSkills,
+        count,
+    });
+
+    res.status(200).json({ data: result });
+});
+
+export const rewriteBullets = asyncHandler(async (req, res) => {
+    const resume = await findUserResumeOrThrow(req.params.id, req.user.id);
+    const { bullets = [], targetRole = resume.targetRole || "" } = req.body;
+
+    if (!Array.isArray(bullets) || !bullets.length) {
+        throw new ApiError(400, "bullets must be a non-empty array");
+    }
+
+    const result = await rewriteExperienceBullets({
+        bullets,
+        targetRole,
+        resumeText: resume.extractedText,
+    });
+
+    res.status(200).json({ data: result });
 });

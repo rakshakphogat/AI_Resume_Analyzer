@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import AnalysisPanel from "../components/AnalysisPanel";
+import GeneratorToolkit from "../components/GeneratorToolkit";
 import ResumeHistory from "../components/ResumeHistory";
 import ResumeUpload from "../components/ResumeUpload";
 import api from "../services/api";
@@ -85,6 +86,7 @@ const DashboardPage = () => {
           resume={activeResume}
           onDownload={handleDownloadReport}
         />
+        <GeneratorToolkit resume={activeResume} />
       </div>
       <ResumeHistory
         resumes={resumes}

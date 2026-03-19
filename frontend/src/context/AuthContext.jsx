@@ -26,6 +26,23 @@ export const AuthProvider = ({ children }) => {
     persistAuth(data.token, data.user);
   };
 
+  const googleLogin = async (idToken) => {
+    const { data } = await api.post("/auth/google", { idToken });
+    persistAuth(data.token, data.user);
+  };
+
+  const forgotPassword = async (email) => {
+    const { data } = await api.post("/auth/forgot-password", { email });
+    return data.message;
+  };
+
+  const resetPassword = async (tokenValue, password) => {
+    const { data } = await api.post(`/auth/reset-password/${tokenValue}`, {
+      password,
+    });
+    return data.message;
+  };
+
   const logout = () => {
     tokenStorage.remove();
     userStorage.remove();
@@ -40,6 +57,9 @@ export const AuthProvider = ({ children }) => {
       isAuthenticated: Boolean(token),
       signup,
       login,
+      googleLogin,
+      forgotPassword,
+      resetPassword,
       logout,
     }),
     [token, user],
