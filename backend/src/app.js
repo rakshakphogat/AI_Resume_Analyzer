@@ -22,6 +22,9 @@ app.use(express.json({ limit: "2mb" }));
 app.use(cookieParser());
 app.use("/uploads", express.static("src/uploads"));
 
+app.get("/", (_req, res) => {
+    res.status(200).json({ status: "ok", message: "API WORKING" });
+});
 app.get("/api/health", (_req, res) => {
     res.status(200).json({ status: "ok", message: "API healthy" });
 });
