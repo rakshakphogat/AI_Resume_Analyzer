@@ -1,34 +1,38 @@
 import { createContext, useContext, useMemo, useState } from "react";
 
 import api from "../services/api";
-import { tokenStorage, userStorage } from "../utils/storage";
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => userStorage.get());
-  const [token, setToken] = useState(() => tokenStorage.get());
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
 
-  const persistAuth = (nextToken, nextUser) => {
-    tokenStorage.set(nextToken);
-    userStorage.set(nextUser);
-    setToken(nextToken);
+  const updateAuth = (nextUser) => {
+    // Token is now stored in httpOnly cookie, only manage user state
     setUser(nextUser);
+    setToken(nextUser ? "authenticated" : null); // Set token to indicate auth state
   };
 
   const signup = async (payload) => {
     const { data } = await api.post("/auth/signup", payload);
-    persistAuth(data.token, data.user);
+    // Token is automatically set in httpOnly cookie by backend
+    updateAuth(data.user);
   };
 
   const login = async (payload) => {
     const { data } = await api.post("/auth/login", payload);
-    persistAuth(data.token, data.user);
+    console.log("API", api);
+    console.log("REACHED HERE");
+    // Token is automatically set in httpOnly cookie by backend
+    updateAuth(data.user);
+    console.log("DONE");
   };
 
   const googleLogin = async (idToken) => {
     const { data } = await api.post("/auth/google", { idToken });
-    persistAuth(data.token, data.user);
+    // Token is automatically set in httpOnly cookie by backend
+    updateAuth(data.user);
   };
 
   const forgotPassword = async (email) => {
@@ -43,11 +47,16 @@ export const AuthProvider = ({ children }) => {
     return data.message;
   };
 
-  const logout = () => {
-    tokenStorage.remove();
-    userStorage.remove();
-    setToken(null);
-    setUser(null);
+  const logout = async () => {
+    try {
+      await api.post("/auth/logout");
+    } catch (err) {
+      console.error("Logout error:", err);
+    } finally {
+      // Clear local state and cookie
+      setToken(null);
+      setUser(null);
+    }
   };
 
   const value = useMemo(

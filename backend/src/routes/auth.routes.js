@@ -4,6 +4,7 @@ import {
     forgotPassword,
     googleLogin,
     login,
+    logout,
     me,
     resetPassword,
     signup,
@@ -15,6 +16,7 @@ const router = Router();
 router.post("/signup", signup);
 router.post("/login", login);
 router.post("/google", googleLogin);
+router.post("/logout", protect, logout);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password/:token", resetPassword);
 router.get("/me", protect, me);

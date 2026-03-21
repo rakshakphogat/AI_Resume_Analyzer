@@ -15,6 +15,14 @@ import {
 
 const googleClient = env.GOOGLE_CLIENT_ID ? new OAuth2Client(env.GOOGLE_CLIENT_ID) : null;
 
+// Cookie options for JWT token
+const getCookieOptions = () => ({
+    httpOnly: true,
+    secure: env.NODE_ENV === "production", // Only use secure cookies in production
+    sameSite: "strict",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+});
+
 export const signup = asyncHandler(async (req, res) => {
     const { name, email, password } = req.body;
 
@@ -32,9 +40,10 @@ export const signup = asyncHandler(async (req, res) => {
 
     const token = signToken({ userId: user._id, email: user.email });
 
+    res.cookie("token", token, getCookieOptions());
+
     res.status(201).json({
         message: "Signup successful",
-        token,
         user: {
             id: user._id,
             name: user.name,
@@ -67,9 +76,10 @@ export const login = asyncHandler(async (req, res) => {
 
     const token = signToken({ userId: user._id, email: user.email });
 
+    res.cookie("token", token, getCookieOptions());
+
     res.status(200).json({
         message: "Login successful",
-        token,
         user: {
             id: user._id,
             name: user.name,
@@ -149,6 +159,15 @@ export const resetPassword = asyncHandler(async (req, res) => {
     return res.status(200).json({ message: "Password reset successful" });
 });
 
+export const logout = asyncHandler(async (req, res) => {
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: env.NODE_ENV === "production",
+        sameSite: "strict",
+    });
+    return res.status(200).json({ message: "Logout successful" });
+});
+
 export const googleLogin = asyncHandler(async (req, res) => {
     if (!googleClient || !env.GOOGLE_CLIENT_ID) {
         throw new ApiError(500, "Google login is not configured on the server");
@@ -186,9 +205,10 @@ export const googleLogin = asyncHandler(async (req, res) => {
 
     const token = signToken({ userId: user._id, email: user.email });
 
+    res.cookie("token", token, getCookieOptions());
+
     return res.status(200).json({
         message: "Google login successful",
-        token,
         user: {
             id: user._id,
             name: user.name,
