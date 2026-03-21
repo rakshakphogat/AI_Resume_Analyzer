@@ -4,13 +4,14 @@ import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardPage from "./pages/DashboardPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import SignupPage from "./pages/SignupPage";
 
 const App = () => (
   <Routes>
-    <Route path="/" element={<Navigate to="/dashboard" />} />
+    <Route path="/" element={<HomePage />} />
     <Route path="/login" element={<LoginPage />} />
     <Route path="/signup" element={<SignupPage />} />
     <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -25,6 +26,7 @@ const App = () => (
         </ProtectedRoute>
       }
     />
+    <Route path="*" element={<Navigate to="/" replace />} />
   </Routes>
 );
 
