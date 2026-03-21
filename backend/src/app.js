@@ -6,7 +6,9 @@ import { env } from "./config/env.js";
 import { errorHandler, notFoundHandler } from "./middleware/error.middleware.js";
 import authRoutes from "./routes/auth.routes.js";
 import resumeRoutes from "./routes/resume.routes.js";
+import { startServer } from "./server.js";
 
+startServer();
 const app = express();
 
 app.use(

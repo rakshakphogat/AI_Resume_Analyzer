@@ -14,7 +14,7 @@ const envSchema = z.object({
     GROQ_MODEL: z.string().default("llama-3.1-8b-instant"),
     OPENAI_API_KEY: z.string().optional(),
     OPENAI_MODEL: z.string().default("gpt-4o-mini"),
-    CLIENT_URL: z.string().default("http://localhost:5173"),
+    CLIENT_URL: z.string().min(1, "CLIENT_URL is required"),
     SMTP_HOST: z.string().optional(),
     SMTP_PORT: z
         .string()

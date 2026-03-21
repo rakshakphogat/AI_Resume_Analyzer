@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import app from "./app.js";
 import { env } from "./config/env.js";
 
-const startServer = async () => {
+export const startServer = async () => {
     try {
         await mongoose.connect(env.MONGO_URI);
         console.log("MongoDB connected");
@@ -16,5 +16,3 @@ const startServer = async () => {
         process.exit(1);
     }
 };
-
-startServer();
