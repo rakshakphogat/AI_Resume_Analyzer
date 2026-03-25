@@ -2,7 +2,6 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 
-import { env } from "./config/env.js";
 import { errorHandler, notFoundHandler } from "./middleware/error.middleware.js";
 import authRoutes from "./routes/auth.routes.js";
 import resumeRoutes from "./routes/resume.routes.js";
@@ -11,9 +10,11 @@ import { startServer } from "./server.js";
 startServer();
 const app = express();
 
+const allowedOrigins = ['http://localhost:5173', 'https://ai-resume-analyzer-ukv4.vercel.app']
+
 app.use(
     cors({
-        origin: env.CLIENT_URL,
+        origin: allowedOrigins,
         credentials: true,
     })
 );

@@ -22,11 +22,8 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (payload) => {
     const { data } = await api.post("/auth/login", payload);
-    console.log("API", api);
-    console.log("REACHED HERE");
     // Token is automatically set in httpOnly cookie by backend
     updateAuth(data.user);
-    console.log("DONE");
   };
 
   const googleLogin = async (idToken) => {
