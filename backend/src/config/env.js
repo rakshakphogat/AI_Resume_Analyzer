@@ -15,6 +15,7 @@ const envSchema = z.object({
     OPENAI_API_KEY: z.string().optional(),
     OPENAI_MODEL: z.string().default("gpt-4o-mini"),
     CLIENT_URL: z.string().min(1, "CLIENT_URL is required"),
+    CLIENT_URLS: z.string().optional(),
     SMTP_HOST: z.string().optional(),
     SMTP_PORT: z
         .string()

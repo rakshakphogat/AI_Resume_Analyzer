@@ -2,19 +2,41 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 
+import { env } from "./config/env.js";
 import { errorHandler, notFoundHandler } from "./middleware/error.middleware.js";
 import authRoutes from "./routes/auth.routes.js";
 import resumeRoutes from "./routes/resume.routes.js";
-import { startServer } from "./server.js";
-
-startServer();
 const app = express();
 
-const allowedOrigins = ['http://localhost:5173', 'https://ai-resume-analyzer-ukv4.vercel.app']
+const allowedOrigins = new Set(["http://localhost:5173", env.CLIENT_URL]);
+
+if (env.CLIENT_URLS) {
+    env.CLIENT_URLS.split(",")
+        .map((value) => value.trim())
+        .filter(Boolean)
+        .forEach((value) => allowedOrigins.add(value));
+}
+
+const vercelProjectPattern = /^https:\/\/ai-resume-analyzer-[a-z0-9-]+\.vercel\.app$/;
+
+const corsOrigin = (origin, callback) => {
+    // Allow non-browser requests and same-origin requests with no Origin header.
+    if (!origin) {
+        callback(null, true);
+        return;
+    }
+
+    if (allowedOrigins.has(origin) || vercelProjectPattern.test(origin)) {
+        callback(null, true);
+        return;
+    }
+
+    callback(new Error(`CORS blocked for origin: ${origin}`));
+};
 
 app.use(
     cors({
-        origin: allowedOrigins,
+        origin: corsOrigin,
         credentials: true,
     })
 );

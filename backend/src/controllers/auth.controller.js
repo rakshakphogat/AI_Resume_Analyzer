@@ -19,7 +19,7 @@ const googleClient = env.GOOGLE_CLIENT_ID ? new OAuth2Client(env.GOOGLE_CLIENT_I
 const getCookieOptions = () => ({
     httpOnly: true,
     secure: env.NODE_ENV === "production", // Only use secure cookies in production
-    sameSite: "strict",
+    sameSite: env.NODE_ENV === "production" ? "none" : "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 });
 
@@ -163,7 +163,7 @@ export const logout = asyncHandler(async (req, res) => {
     res.clearCookie("token", {
         httpOnly: true,
         secure: env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: env.NODE_ENV === "production" ? "none" : "lax",
     });
     return res.status(200).json({ message: "Logout successful" });
 });
